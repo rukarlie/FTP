@@ -14,7 +14,7 @@ class ftpHndlr:
                         lst[i]=lst[i].replace(ismb,'')
                     
                 config_dir[lst[0]]=lst[1]
-        
+        print(config_dir)
         pass
     
     def dirClbk(self,p0:str) -> None:
