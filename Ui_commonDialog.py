@@ -29,8 +29,8 @@ class Ui_Dialog(object):
         self.inLine = QtWidgets.QLineEdit(Dialog)
         self.inLine.setGeometry(QtCore.QRect(110, 50, 210, 20))
         self.inLine.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.inLine.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.inLine.setObjectName("sndSpd")
+        self.inLine.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.inLine.setObjectName("inLine")
 
         self.retranslateUi(Dialog)
         self.buttonBox.accepted.connect(Dialog.accept)
