@@ -82,6 +82,7 @@ class cDialog(object):
 
 
 ignore_symbol=['\n',' ', '\\n', '\t']
+err_msg = "Что-то пошло не так \n"
 
 class ftpHndlr:
     def __init__(self, MainWindow:QtWidgets.QMainWindow) -> None:
@@ -90,17 +91,26 @@ class ftpHndlr:
         self.ftp:FTP
         self.mwindow= MainWindow
         self.isOpen=False
-        with open('ftpconnection.cfg','r') as f:
-            for l in f:
-                lst = list(l.split('='))
-                for i in range(len(lst)):
-                    for ismb in ignore_symbol:
-                        lst[i]=lst[i].replace(ismb,'')
-                    
-                self.config_dir[lst[0]]=lst[1]
-        
+        try:
+            with open('ftpconnection.cfg','r') as f:
+                for l in f:
+                    if '=' in l:
+                        lst = list(l.split('='))
+                        for i in range(len(lst)):
+                            for ismb in ignore_symbol:
+                                lst[i]=lst[i].replace(ismb,'')
+                            
+                        self.config_dir[lst[0]]=lst[1]
+        except:
+            msg=str(sys.exc_info()[1])
+            self.__info(err_msg+msg)
         pass
     
+    def saveConfigs(self):
+        with open('ftpconnection.cfg','w') as f:
+            for l in self.config_dir.keys():
+                f.write(l+'='+self.config_dir[l]+'\n')
+
     def connect(self):
         
        
@@ -162,7 +172,7 @@ class ftpHndlr:
             msg=str(sys.exc_info()[1])
             self.ftp.close()
         self.__info("Соединение закрыто\n"+msg)
-
+        self.isOpen = False
     def __info(self,msg:str):
         dl2=iDialog()
         dlg2=QDialog(self.mwindow)
@@ -185,10 +195,12 @@ class ftpHndlr:
         try:
             with open(dst,'wb') as f:
                 self.ftp.retrbinary('RETR '+src, f.write)
+            return True
         except:
             msg=str(sys.exc_info()[1])
-            self.__info("Что-то пошло не так \n"+msg)
-        pass
+            self.__info(err_msg+msg)
+            return False
+        
 
     def upload(self,src:str,dst:str):
         try:
@@ -196,7 +208,7 @@ class ftpHndlr:
                 self.ftp.storbinary('STOR '+dst,f)
         except:
             msg=str(sys.exc_info()[1])
-            self.__info("Что-то пошло не так \n"+msg)
+            self.__info(err_msg+msg)
         pass
     
     def getDirList(self)->list:
@@ -205,7 +217,7 @@ class ftpHndlr:
             self.ftp.retrlines('LIST',fh.dirClbk)
         except:
             msg=str(sys.exc_info()[1])
-            self.__info("Что-то пошло не так \n"+msg)
+            self.__info(err_msg+msg)
         return self.dir_list
     
     def changeDir(self, new_dir:str):
@@ -228,7 +240,7 @@ if __name__ == "__main__":
     MWindow.show()
     fh.connect()
     #fh.download('test','test.txt')
-    #fh.upload('ftpconnection.cfg','ftp_share/ftpconnection.cfg')
+    fh.upload('test/result12727.bin','ftp_share/result.bin')
     fh.getDirList()
     fh.disconnect()
     #fh.mwindow.show()
